@@ -1,0 +1,11 @@
+version: "3"
+services:
+  sqs-lambda-run:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      ENV_NAME: dev
+      SQS_URL: "http://localhost:9324/queue/example"
+      LAMBDA_FUNCTION_NAME: "index.handler"
+      LAMBDA_ENDPOINT: "http://localhost:9001"
