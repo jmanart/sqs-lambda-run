@@ -7,5 +7,6 @@ services:
     environment:
       ENV_NAME: dev
       SQS_URL: "http://localhost:9324/queue/example"
-      LAMBDA_FUNCTION_NAME: "index.handler"
+      CREATE_QUEUE: "true"
+      LAMBDA_HANDLER: "index.handler"
       LAMBDA_ENDPOINT: "http://localhost:9001"

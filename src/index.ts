@@ -13,7 +13,6 @@ async function poll(
     }
 
     await Promise.all(Messages.map(async message => {
-
         try {
             await lambda.run(message.Body)
         } catch (err) {
@@ -23,17 +22,23 @@ async function poll(
 
         await sqs.deleteMessage(message.ReceiptHandle)
     }))
-}  
+}
 
 async function infinityRun() {
     const {
         sqsUrl,
-        handler,
-        endpoint,
+        createQueue,
+        lambdaHandler,
+        lambdaEndpoint,
     } = getConfig()
 
-    const sqs = new SQS(endpoint, sqsUrl)
-    const lambda = new Lambda(endpoint, handler)
+    const sqs = new SQS(sqsUrl);
+
+    if (createQueue) {
+        await sqs.createQueue();
+    }
+
+    const lambda = new Lambda(lambdaEndpoint, lambdaHandler)
 
     // TODO: register handler for interruptions
     while (true) {
