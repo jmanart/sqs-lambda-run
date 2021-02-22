@@ -1,12 +1,12 @@
 // A simple wrapper to receive and delete messages from an sqs queue
 
-import * as AWS from "aws-sdk"
+import * as AWS from "aws-sdk";
 
 export class SQS {
-    readonly sqs: AWS.SQS
-    readonly sqsEndpoint: string
-    readonly sqsUrl: string
-    readonly queueName: string
+    readonly sqs: AWS.SQS;
+    readonly sqsEndpoint: string;
+    readonly sqsUrl: string;
+    readonly queueName: string;
 
     constructor(sqsUrl: string) {
         const splitURL = sqsUrl.split("/");
@@ -28,10 +28,10 @@ export class SQS {
                 QueueName: this.queueName,
             };
             await this.sqs.createQueue(params).promise();
-            console.log("DONE CREATING QUEUE!");
+            console.log(`DONE CREATING QUEUE "${this.queueName}"!`);
         } catch(err) {
             if (err.toString().indexOf("NetworkingError: connect ECONNREFUSED") >= 0) {
-                console.log("WAITING FOR SQS...");
+                console.log(`WAITING FOR SQS TO CREATE "${this.queueName}"...`);
                 await new Promise(resolve => setTimeout(resolve, 1000))
                 await this.createQueue();
             } else {
@@ -47,19 +47,19 @@ export class SQS {
             MaxNumberOfMessages: 10,
             VisibilityTimeout: 10,
             WaitTimeSeconds: 5, // how long to wait before returning
-        }
-        const { Messages } = await (this.sqs as AWS.SQS).receiveMessage(params).promise()
-        return Messages
+        };
+        const { Messages } = await (this.sqs as AWS.SQS).receiveMessage(params).promise();
+        return Messages;
     }
 
     async deleteMessage(receiptHandle: string | undefined) {
         if (!receiptHandle) {
-            return
+            return;
         }
 
         await (this.sqs as AWS.SQS).deleteMessage({
             QueueUrl: this.sqsUrl,
             ReceiptHandle: receiptHandle,
-        }).promise()
+        }).promise();
     }
 }
