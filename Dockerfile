@@ -3,6 +3,7 @@ FROM node:12-alpine
 ENV NODE_ENV dev
 ENV AWS_REGION eu-west-2
 
+VOLUME /etc/sqs
 WORKDIR /opt/app_static
 
 # SETUP
