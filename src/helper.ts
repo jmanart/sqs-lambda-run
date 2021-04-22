@@ -1,13 +1,30 @@
-export function getConfig() {
-    const sqsUrl = process.env.SQS_URL
-    const createQueue = Boolean(process.env.CREATE_QUEUE)
-    const lambdaHandler = process.env.LAMBDA_HANDLER
-    const lambdaEndpoint = process.env.LAMBDA_ENDPOINT
+import * as fs from "fs";
+import { Config } from "./model/config";
 
-    console.debug("sqslUrl", sqsUrl);
+const configFilePath = "/etc/sqs/sqs.json";
+
+export function getConfig(): Config[] {
+    let configFile = null;
+
+    if (fs.existsSync(configFilePath)) {
+        configFile = JSON.parse(fs.readFileSync(configFilePath).toString("ascii"));
+        return configFile.queues.map((queue: any) => ({
+            sqsUrl: `${queue.host}/${queue.name}`,
+            createQueue: true,
+            lambdaHandler: queue.lambda.handler,
+            lambdaEndpoint: queue.lambda.endpoint,
+        }));
+    }
+
+    const sqsUrl = process.env.SQS_URL;
+    const createQueue = Boolean(process.env.CREATE_QUEUE);
+    const lambdaHandler = process.env.LAMBDA_HANDLER;
+    const lambdaEndpoint = process.env.LAMBDA_ENDPOINT;
+
+    console.debug("sqsUrl", sqsUrl);
     console.debug("lambdaHandler", lambdaHandler);
     console.debug("lambdaEndpoint", lambdaEndpoint);
-    console.debug("createQueue", createQueue)
+    console.debug("createQueue", createQueue);
 
     if (!sqsUrl) {
         throw new Error("Missing SQS_URL");
@@ -18,10 +35,10 @@ export function getConfig() {
     if (!lambdaEndpoint) {
         throw new Error("Missing LAMBDA_ENDPOINT");
     }
-    return {
+    return [{
         sqsUrl,
         createQueue,
         lambdaHandler,
         lambdaEndpoint,
-    }
+    }];
 }

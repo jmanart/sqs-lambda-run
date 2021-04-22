@@ -23,6 +23,7 @@ export class Lambda {
             InvocationType: "Event",
             Payload: payload,
         };
+        console.log("payload", payload);
         await this.lambda.invoke(params).promise()
     }
 }

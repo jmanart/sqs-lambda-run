@@ -28,10 +28,10 @@ export class SQS {
                 QueueName: this.queueName,
             };
             await this.sqs.createQueue(params).promise();
-            console.log("DONE CREATING QUEUE!");
-        } catch(err) {
+            console.log(`DONE CREATING QUEUE! "${this.queueName}"`);
+        } catch (err) {
             if (err.toString().indexOf("NetworkingError: connect ECONNREFUSED") >= 0) {
-                console.log("WAITING FOR SQS...");
+                console.log(`WAITING FOR SQS TO CREATE "${this.queueName}"`);
                 await new Promise(resolve => setTimeout(resolve, 1000))
                 await this.createQueue();
             } else {
